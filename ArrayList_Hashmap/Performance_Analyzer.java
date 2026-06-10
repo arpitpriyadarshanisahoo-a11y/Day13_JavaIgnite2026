@@ -1,49 +1,70 @@
-/*
-Create a Java program to manage student course performance.
+import java.sql.*;
+import java.util.ArrayList;
 
-Task:
+class Student {
+    int id;
+    String name;
+    int marks;
 
-You are given multiple students with the following details:
+    Student(int id, String name, int marks) {
+        this.id = id;
+        this.name = name;
+        this.marks = marks;
+    }
+}
 
-Student Name
-Course Name
-Marks
-Requirements:
-Store all student records using ArrayList
-Use a HashMap<String, List<Integer>> where:
-Key = Course Name
-Value = List of marks in that course
-Calculate and display:
-Average marks for each course
-Course with highest average
-Hint:
+public class StudentReport {
+	 public static void main(String[] args) {
 
-Break the problem into steps:
+	        try {
+	          
+	            Class.forName("com.mysql.cj.jdbc.Driver");
 
-First store raw data in ArrayList
-Then group marks by course using HashMap
+	          
+	            Connection con = DriverManager.getConnection(
+	            	    "jdbc:mysql://localhost:3306/college_db", "root", "");
 
-for each loop - enhanced for loop 
-for(int i=0;i<list.size();i++)
-Student s=list.get(i)
+	          
+	            Statement st = con.createStatement();
+	            ResultSet rs = st.executeQuery("SELECT * FROM students");
 
-for(Student s : list)
-String course = s.course 
-int marks = s.marks 
-if(map.containsKey(course))
-ArrayList<Integer> marksList = map.get(course)
-marksList.add(marks)
+	            ArrayList<Student> list = new ArrayList<>();
 
-ArrayList<Integer> marksList = map.get(course)
-marksList.add(marks)
-map.put(course,marksList)
+	            int totalMarks = 0;
+	            int count = 0;
 
+	          
+	            while (rs.next()) {
+	                int id = rs.getInt("id");
+	                String name = rs.getString("name");
+	                int marks = rs.getInt("marks");
 
-Then iterate HashMap to calculate averages - for(String course:map.keySet())- creating arraylist -int sum =0, 
-for(int i=0;i<marksList.size();i++)
-sum=sum+marksList(i)
-double =(double)sum/marksList.size();
+	                list.add(new Student(id, name, marks));
 
+	                totalMarks += marks;
+	                count++;
+	            }
 
-Finally compare averages
-  */
+	       
+	            double average = (double) totalMarks / count;
+
+	            System.out.println("Average Marks = " + average);
+
+	            System.out.println("\nStudents Scoring Above Average:");
+
+	       
+	            for (Student s : list) {
+	                if (s.marks > average) {
+	                    System.out.println(
+	                            s.id + " " + s.name + " " + s.marks);
+	                }
+	            }
+
+	            System.out.println("\nTotal Students Processed = " + count);
+
+	            con.close();
+
+	        } catch (Exception e) {
+	            System.out.println(e);
+	        }
+	    }
