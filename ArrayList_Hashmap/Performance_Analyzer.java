@@ -1,70 +1,63 @@
-import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 class Student {
-    int id;
-    String name;
+    String studentName;
+    String courseName;
     int marks;
 
-    Student(int id, String name, int marks) {
-        this.id = id;
-        this.name = name;
+    Student(String studentName, String courseName, int marks) {
+        this.studentName = studentName;
+        this.courseName = courseName;
         this.marks = marks;
     }
 }
 
-public class StudentReport {
+public class CoursePerformance {
 	 public static void main(String[] args) {
 
-	        try {
-	          
-	            Class.forName("com.mysql.cj.jdbc.Driver");
+	        ArrayList<Student> students = new ArrayList<>();
 
-	          
-	            Connection con = DriverManager.getConnection(
-	            	    "jdbc:mysql://localhost:3306/college_db", "root", "");
+	        students.add(new Student("Rahul", "Java", 85));
+	        students.add(new Student("Priya", "Java", 90));
+	        students.add(new Student("Amit", "Python", 78));
+	        students.add(new Student("Sneha", "Python", 88));
+	        students.add(new Student("Riya", "C++", 92));
+	        students.add(new Student("Karan", "C++", 86));
 
-	          
-	            Statement st = con.createStatement();
-	            ResultSet rs = st.executeQuery("SELECT * FROM students");
+	        HashMap<String, List<Integer>> courseMarks = new HashMap<>();
 
-	            ArrayList<Student> list = new ArrayList<>();
-
-	            int totalMarks = 0;
-	            int count = 0;
-
-	          
-	            while (rs.next()) {
-	                int id = rs.getInt("id");
-	                String name = rs.getString("name");
-	                int marks = rs.getInt("marks");
-
-	                list.add(new Student(id, name, marks));
-
-	                totalMarks += marks;
-	                count++;
-	            }
-
-	       
-	            double average = (double) totalMarks / count;
-
-	            System.out.println("Average Marks = " + average);
-
-	            System.out.println("\nStudents Scoring Above Average:");
-
-	       
-	            for (Student s : list) {
-	                if (s.marks > average) {
-	                    System.out.println(
-	                            s.id + " " + s.name + " " + s.marks);
-	                }
-	            }
-
-	            System.out.println("\nTotal Students Processed = " + count);
-
-	            con.close();
-
-	        } catch (Exception e) {
-	            System.out.println(e);
+	        for (Student s : students) {
+	            courseMarks.putIfAbsent(s.courseName, new ArrayList<>());
+	            courseMarks.get(s.courseName).add(s.marks);
 	        }
+
+	        String highestCourse = "";
+	        double highestAverage = 0;
+
+	        System.out.println("Average Marks for Each Course:");
+
+	        for (String course : courseMarks.keySet()) {
+	            List<Integer> marksList = courseMarks.get(course);
+
+	            int sum = 0;
+	            for (int mark : marksList) {
+	                sum += mark;
+	            }
+
+	            double average = (double) sum / marksList.size();
+
+	            System.out.println(course + " = " + average);
+
+	            if (average > highestAverage) {
+	                highestAverage = average;
+	                highestCourse = course;
+	            }
+	        }
+
+	        System.out.println("\nCourse with Highest Average:");
+	        System.out.println(highestCourse + " = " + highestAverage);
 	    }
+
+}
